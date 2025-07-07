@@ -1,13 +1,20 @@
-from ui import WeatherApp
+# weather_app/main.py
+
+import tkinter as tk
+from ui import HomeScreen  # your welcome screen
+from weather_dashboard import WeatherDashboard  # the full app view
+
+def start_app(name, location):
+    root = tk.Tk()
+    root.geometry("800x500")
+    app = WeatherDashboard(root, name, location)
+    root.mainloop()
 
 if __name__ == "__main__":
-    try:
-        app = WeatherApp()
-        app.mainloop()
-    except Exception as e:
-        print(f"App failed to run: {e}")
-# This code initializes the WeatherApp and starts the main loop.
-# It also includes error handling to catch any exceptions that may occur during the app's execution.
-# This code initializes the WeatherApp and starts the main loop.
-# It also includes error handling to catch any exceptions that may occur during the app's execution.
+    root = tk.Tk()
+    root.geometry("800x500")
+    HomeScreen(root, on_continue=start_app)
+    root.mainloop()
+# This is the main entry point for the weather app.
+# It initializes the Tkinter root window and starts the app with a welcome screen.
 
