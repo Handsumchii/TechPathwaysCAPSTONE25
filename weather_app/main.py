@@ -1,20 +1,12 @@
 # weather_app/main.py
-
-import tkinter as tk
-from ui import HomeScreen  # your welcome screen
-from weather_dashboard import WeatherDashboard  # the full app view
-
-def start_app(name, location):
-    root = tk.Tk()
-    root.geometry("800x500")
-    app = WeatherDashboard(root, name, location)
-    root.mainloop()
+from ui import WeatherApp
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    root.geometry("800x500")
-    HomeScreen(root, on_continue=start_app)
-    root.mainloop()
-# This is the main entry point for the weather app.
-# It initializes the Tkinter root window and starts the app with a welcome screen.
+    app = WeatherApp()
+    app.mainloop()
+# This is the main entry point for the weather application.
+# It imports the WeatherApp class from the ui module and starts the application.
+# The application will run until the user closes it.
+# The mainloop method keeps the application running and responsive to user interactions.
+
 
