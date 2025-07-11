@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkinter
+
 import os
 from PIL import Image, ImageTk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class WeatherUI:
     """Handle all UI components and layouts"""
@@ -222,7 +223,7 @@ class WeatherUI:
         self.forecast_ax.set_xlabel("Hour")
         self.forecast_ax.set_ylabel("Temperature (°C)")
         
-        self.forecast_canvas = FigureCanvasTkinter.FigureCanvasTkAgg(self.forecast_fig, master=self.forecast_frame)
+        self.forecast_canvas = FigureCanvasTkAgg(self.forecast_fig, master=self.forecast_frame)
         self.forecast_canvas.get_tk_widget().grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         self.forecast_canvas.draw()
     def load_background_image(self):
@@ -361,3 +362,83 @@ class WeatherUI:
             if self.weather_icon.image:
                 self.weather_icon.image = self.weather_icon.image
             self.weather_icon.configure(foreground='#000000' if self.current_theme == 'light' else '#ffffff')
+    def on_resize(self, event):
+        """Handle window resize events"""
+        if self.bg_label and self.bg_image:
+            self.bg_image = self.bg_image.resize((event.width, event.height), Image.ANTIALIAS)
+            self.bg_label.configure(image=self.bg_image)
+            self.bg_label.image = self.bg_image
+        # Redraw forecast canvas on resize
+        if self.forecast_canvas:
+            self.forecast_canvas.get_tk_widget().configure(width=event.width, height=event.height)
+            self.forecast_canvas.draw()
+    def clear_weather_display(self):
+        """Clear all weather display fields"""
+        self.location_label.config(text="Location: --")
+        self.temp_label.config(text="Temperature: --")
+        self.desc_label.config(text="Description: --")
+        self.humidity_label.config(text="Humidity: --")
+        self.wind_label.config(text="Wind: --")
+        self.weather_icon.config(text="🌤️", image=None)
+        self.pressure_label.config(text="Pressure: --")
+        self.visibility_label.config(text="Visibility: --")
+        self.sunrise_label.config(text="Sunrise: --")
+        self.sunset_label.config(text="Sunset: --")
+        self.clear_journal()
+        self.update_forecast_display({'list': []})
+    def show_error(self, message):
+        """Display an error message in a popup"""
+        error_popup = tk.Toplevel(self.root)
+        error_popup.title("Error")
+        error_popup.geometry("300x150")
+        error_label = ttk.Label(error_popup, text=message, wraplength=250)
+        error_label.pack(pady=20)
+        close_button = ttk.Button(error_popup, text="Close", command=error_popup.destroy)
+        close_button.pack(pady=(0, 20))
+        error_popup.transient(self.root)
+        error_popup.grab_set()  # Make sure the popup is modal
+        self.root.wait_window(error_popup)
+        error_popup.focus_set()
+        error_popup.lift()
+        error_popup.attributes("-topmost", True)
+        error_popup.attributes("-topmost", False)
+        error_popup.focus_force()
+
+if __name__ == "__main__":
+    import tkinter as tk
+
+    class DummyApp:
+        def on_city_search(self, city):
+            print(f"Searching weather for: {city}")
+
+        def on_save_journal(self, mood, notes):
+            print(f"Saving journal: Mood={mood}, Notes={notes}")
+
+        def on_journal_update(self, mood, notes):
+            print(f"Updating journal: Mood={mood}, Notes={notes}")
+
+        def toggle_dark_mode(self):
+            print("Toggling theme")
+
+        def format_time(self, timestamp):
+            from datetime import datetime
+            return datetime.fromtimestamp(timestamp).strftime('%H:%M')
+
+        class config:
+            @staticmethod
+            def get_mood_options():
+                return ["Happy", "Sad", "Anxious", "Calm", "Frustrated"]
+
+    root = tk.Tk()
+    root.title("Weather App")
+    try:
+        ui = WeatherUI(root, DummyApp())
+        ui.setup_ui()
+        print("UI setup complete.")
+        root.mainloop()
+    except Exception as e:
+        print(f"💥 ERROR during UI launch: {e}")
+
+# weather_app/ui.py
+# This module defines the WeatherUI class which handles all user interface components and layouts.
+

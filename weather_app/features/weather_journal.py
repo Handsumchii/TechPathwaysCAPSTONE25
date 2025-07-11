@@ -2,7 +2,7 @@ import os
 import json
 from datetime import datetime
 import csv
-
+import tkinter as tk
 class WeatherJournal:
     """Handle weather journal functionality"""
     
@@ -285,3 +285,11 @@ Notes: {entry_data['notes']}
         }
         
         return summary
+
+# weather_app/main.py
+if __name__ == "__main__":
+    root = tk.Tk()
+    # setup code...
+    root.mainloop()
+    
+    
