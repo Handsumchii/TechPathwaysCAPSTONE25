@@ -4,12 +4,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_KEY = os.getenv("OPENWEATHER_API_KEY")
+API_KEY = os.getenv("WEATHER_API_KEY")
 BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
 FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"
 ONECALL_URL = "https://api.openweathermap.org/data/2.5/onecall"
 
 def get_weather_data(city):
+    print("✅ Loaded API key:", API_KEY)
+
     try:
         response = requests.get(BASE_URL, params={"q": city, "appid": API_KEY, "units": "metric"})
         return response.json()

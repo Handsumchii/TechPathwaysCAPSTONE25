@@ -1,5 +1,6 @@
 import tkinter as tk
 from ui import WeatherUI
+from weather import get_weather_data  # ← make sure this exists
 
 class WeatherApp:
     def __init__(self, root):
@@ -8,18 +9,20 @@ class WeatherApp:
         self.ui.setup_ui()
     
     def on_city_search(self, city):
-        # Implement your weather search logic here
-        print(f"Search for city: {city}")
+        print(f"🔍 Searching weather for: {city}")
+        weather_data = get_weather_data(city)
+        print("📦 Received weather data:", weather_data)
+        self.ui.update_weather_display(weather_data)
     
     def on_save_journal(self, mood, notes):
-        print(f"Save journal with mood={mood} and notes={notes}")
+        print(f"💾 Save journal with mood={mood} and notes={notes}")
     
     def on_journal_update(self, mood, notes):
-        # Optional, handle real-time journal updates
         pass
     
     def toggle_dark_mode(self):
-        print("Toggle theme")
+        print("🌓 Toggle theme")
+        self.ui.toggle_theme()
     
     def format_time(self, timestamp):
         from datetime import datetime
@@ -35,10 +38,3 @@ if __name__ == "__main__":
     root.title("Weather App")
     app = WeatherApp(root)
     root.mainloop()
-
-# This is the main entry point for the weather application.
-# It imports the WeatherApp class from the ui module and starts the application.
-# The application will run until the user closes it.
-# The mainloop method keeps the application running and responsive to user interactions.
-
-
