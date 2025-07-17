@@ -4,5 +4,21 @@
         "mood": "Anxious",
         "notes": "hijpjonkjn",
         "timestamp": "2025-07-17T17:46:46.099443"
+    },
+    {
+        "city": "New York",
+        "mood": "Frustrated",
+        "notes": "I feel exhausted and blah today",
+        "timestamp": "2025-07-17T17:59:22.925191"
+    },
+    {
+        "city": "New York",
+        "mood": "Calm",
+        "notes": {
+            "What are you grateful for today?": "All of my opportunities",
+            "Who made a positive impact on your day?": "My mom",
+            "What small thing made you smile?": "My dog kairo chasing me"
+        },
+        "timestamp": "2025-07-17T18:16:11.398077"
     }
 ]
