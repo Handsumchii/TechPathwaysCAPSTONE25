@@ -1,180 +1,198 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from PIL import Image, ImageTk, ImageEnhance
-import os
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from weather import get_weather_data
 from journal_utils import save_journal_entry
 
-# 🧠 Journal categories and questions
-JOURNAL_QUESTIONS = {
-    "Gratitude": [
-        "What are you grateful for today?",
-        "Who made a positive impact on your day?",
-        "What small thing made you smile?"
-    ],
-    "Challenges": [
-        "What challenges did you face today?",
-        "How did you handle those challenges?",
-        "What can you learn from them?"
-    ],
-    "Goals": [
-        "What is one goal you want to achieve?",
-        "What steps will you take to reach it?",
-        "How will you celebrate when you succeed?"
-    ]
-}
+class WelcomeScreen(tk.Frame):
+    def __init__(self, master, on_submit_name):
+        super().__init__(master)
+        self.on_submit_name = on_submit_name
 
-class WeatherUI:
-    def __init__(self, root, app):
-        self.root = root
-        self.app = app
-        self.city_var = tk.StringVar(value="New York")
-        self.mood_var = tk.StringVar()
-        self.category_var = tk.StringVar()
-        self.answer_textboxes = []
-        self.forecast_fig = None
-        self.forecast_canvas = None
+        # Title
+        tk.Label(self, text="🌤️ VibeCheck: Weather Edition",
+                 font=("Helvetica", 26, "bold"), fg="#4A90E2").pack(pady=(30, 5))
 
-    def setup_ui(self):
-        self.root.title("Weather App")
-        self.root.geometry("900x700")
-        self.load_background_image()
-        self.main_frame = tk.Frame(self.root)
-        self.main_frame.place(relwidth=1, relheight=1)
-        self.setup_search_section()
-        self.setup_weather_section()
-        self.setup_journal_section()
-        self.setup_forecast_section()
+        # Tagline
+        tk.Label(self, text="Track the skies. Reflect the soul.",
+                 font=("Helvetica", 14, "italic"), fg="#666").pack(pady=(0, 20))
 
-    def load_background_image(self):
+        # Name input prompt
+        tk.Label(self, text="Welcome! What's your name?", font=("Helvetica", 12)).pack(pady=(10, 5))
+        self.name_entry = tk.Entry(self, font=("Helvetica", 12))
+        self.name_entry.pack()
+
+        # Submit button
+        tk.Button(self, text="Start Vibe Check", font=("Helvetica", 12, "bold"),
+                  bg="#4A90E2", fg="white", command=self.submit_name).pack(pady=20)
+
+    def submit_name(self):
+        username = self.name_entry.get().strip()
+        if username:
+            self.on_submit_name(username)
+        else:
+            messagebox.showwarning("Input Required", "Please enter your name to continue.")
+
+class Dashboard(tk.Frame):
+    def __init__(self, master, username):
+        super().__init__(master)
+        self.master = master
+        self.username = username
+
+        self.use_celsius = True  # Default temperature unit
+
+        # Journal categories and questions
+        self.category_questions = {
+            "Emotional Health": [
+                "How are you feeling emotionally today?",
+                "What has affected your mood most?",
+                "What support do you need?"
+            ],
+            "Physical Health": [
+                "How does your body feel today?",
+                "Did the weather affect your physical activity?",
+                "What can you do to take care of your health?"
+            ],
+            "Mindfulness": [
+                "What was a mindful moment you had today?",
+                "How did the weather impact your awareness?",
+                "What are you grateful for today?"
+            ]
+        }
+
+        self.selected_category = tk.StringVar()
+        self.question_labels = []
+        self.question_textboxes = []
+
+        self.create_widgets()
+
+    def create_widgets(self):
+        # Greeting
+        tk.Label(self, text=f"Welcome back, {self.username}! 👋",
+                 font=("Helvetica", 16, "bold"), fg="#333").pack(pady=(20, 10))
+
+        # City input and weather display
+        tk.Label(self, text="Enter City:").pack()
+        self.city_entry = tk.Entry(self)
+        self.city_entry.pack()
+
+        tk.Button(self, text="Get Weather", command=self.get_weather).pack(pady=5)
+
+        self.toggle_temp_button = tk.Button(self, text="Switch to °F", command=self.toggle_temperature_unit)
+        self.toggle_temp_button.pack(pady=5)
+
+        self.weather_display = tk.Label(self, text="", font=("Helvetica", 14))
+        self.weather_display.pack(pady=10)
+
+        # Journal Section
+        tk.Label(self, text="Today's Mood:").pack()
+        self.mood_entry = tk.Entry(self)
+        self.mood_entry.pack(pady=5)
+
+        tk.Label(self, text="Select Journal Category:").pack()
+        self.category_dropdown = ttk.Combobox(self, textvariable=self.selected_category)
+        self.category_dropdown["values"] = list(self.category_questions.keys())
+        self.category_dropdown.bind("<<ComboboxSelected>>", self.on_category_change)
+        self.category_dropdown.pack(pady=5)
+
+        self.questions_frame = tk.Frame(self)
+        self.questions_frame.pack(pady=10)
+
+        tk.Label(self, text="Additional Notes:").pack()
+        self.notes_entry = tk.Text(self, height=4)
+        self.notes_entry.pack(pady=5)
+
+        tk.Button(self, text="Save Entry", command=self.save_entry).pack(pady=10)
+
+    def toggle_temperature_unit(self):
+        self.use_celsius = not self.use_celsius
+        new_label = "Switch to °C" if not self.use_celsius else "Switch to °F"
+        self.toggle_temp_button.config(text=new_label)
+
+        city = self.city_entry.get()
+        if city:
+            self.display_weather(city)
+
+    def get_weather(self):
+        city = self.city_entry.get()
+        if not city:
+            messagebox.showwarning("Input Error", "Please enter a city name.")
+            return
+        self.display_weather(city)
+
+    def display_weather(self, city):
         try:
-            path = os.path.join(os.path.dirname(__file__), 'visual_assets', 'background.jpg')
-            img = Image.open(path).resize((900, 700))
-            img = ImageEnhance.Brightness(img).enhance(0.5)
-            bg = ImageTk.PhotoImage(img)
-            tk.Label(self.root, image=bg).place(x=0, y=0, relwidth=1, relheight=1)
-            self.bg_image = bg  # keep reference
+            data = get_weather_data(city)
+            kelvin_temp = data["main"]["temp"]
+            if self.use_celsius:
+                temperature = kelvin_temp - 273.15
+                unit = "°C"
+            else:
+                temperature = (kelvin_temp - 273.15) * 9 / 5 + 32
+                unit = "°F"
+
+            weather = data["weather"][0]["description"].capitalize()
+            output = f"{city} Weather: {temperature:.1f}{unit}, {weather}"
+            self.weather_display.config(text=output)
         except Exception as e:
-            print(f"Background load error: {e}")
-
-    def setup_search_section(self):
-        frame = tk.Frame(self.main_frame, bg="#ffffff")
-        frame.pack(pady=10)
-
-        tk.Label(frame, text="City:").pack(side=tk.LEFT, padx=5)
-        entry = tk.Entry(frame, textvariable=self.city_var)
-        entry.pack(side=tk.LEFT)
-        entry.bind("<Return>", lambda e: self.app.on_city_search(self.city_var.get()))
-        tk.Button(frame, text="Get Weather", command=lambda: self.app.on_city_search(self.city_var.get())).pack(side=tk.LEFT, padx=5)
-        tk.Button(frame, text="Toggle Dark Mode", command=self.app.toggle_dark_mode).pack(side=tk.LEFT)
-
-    def setup_weather_section(self):
-        self.weather_frame = ttk.LabelFrame(self.main_frame, text="Weather Info")
-        self.weather_frame.pack(fill='x', padx=10, pady=5)
-
-        self.labels = {}
-        keys = ['Location', 'Temperature', 'Pressure', 'Visibility', 'Sunrise', 'Sunset']
-        for i, key in enumerate(keys):
-            lbl = tk.Label(self.weather_frame, text=f"{key}: --")
-            lbl.grid(row=i//2, column=i % 2, sticky='w')
-            self.labels[key] = lbl
-
-    def setup_journal_section(self):
-        frame = ttk.LabelFrame(self.main_frame, text="Journal")
-        frame.pack(fill='x', padx=10, pady=5)
-
-        # Category dropdown
-        categories = list(JOURNAL_QUESTIONS.keys())
-        self.category_var.set(categories[0])
-        ttk.Label(frame, text="Category:").pack(anchor='w', padx=5)
-        dropdown = ttk.Combobox(frame, textvariable=self.category_var, values=categories, state="readonly")
-        dropdown.pack(fill='x', padx=5)
-        dropdown.bind("<<ComboboxSelected>>", self.on_category_change)
-
-        # Mood dropdown
-        ttk.Label(frame, text="Mood:").pack(anchor='w', padx=5, pady=(10, 0))
-        mood_values = self.app.config.get_mood_options()
-        ttk.Combobox(frame, textvariable=self.mood_var, values=mood_values, state="readonly").pack(fill='x', padx=5)
-
-        # Journal question and answer area
-        self.questions_frame = tk.Frame(frame)
-        self.questions_frame.pack(fill='both', expand=True, padx=5, pady=5)
-        self.display_questions(self.category_var.get())
-
-        # Save button
-        tk.Button(frame, text="Save Entry", command=self.save_journal).pack(pady=10)
-
-    def display_questions(self, category):
-        for widget in self.questions_frame.winfo_children():
-            widget.destroy()
-        self.answer_textboxes.clear()
-
-        questions = JOURNAL_QUESTIONS.get(category, [])
-        for q in questions:
-            tk.Label(self.questions_frame, text=q, wraplength=600, justify='left').pack(anchor='w', pady=(10, 0))
-            text_box = tk.Text(self.questions_frame, height=3, wrap=tk.WORD)
-            text_box.pack(fill='x', pady=(0, 10))
-            self.answer_textboxes.append(text_box)
+            messagebox.showerror("Error", f"Failed to get weather data:\n{e}")
 
     def on_category_change(self, event=None):
-        selected_category = self.category_var.get()
-        self.display_questions(selected_category)
+        for widget in self.questions_frame.winfo_children():
+            widget.destroy()
 
-    def save_journal(self):
-        mood = self.mood_var.get()
-        city = self.city_var.get()
-        category = self.category_var.get()
-        answers = [tb.get("1.0", tk.END).strip() for tb in self.answer_textboxes]
+        self.question_labels.clear()
+        self.question_textboxes.clear()
 
-        if not mood or not any(answers):
-            messagebox.showwarning("Incomplete", "Please select a mood and answer at least one question.")
-            return
+        selected = self.selected_category.get()
+        questions = self.category_questions.get(selected, [])
 
-        # Build structured notes dictionary
-        notes_dict = {}
-        questions = JOURNAL_QUESTIONS.get(category, [])
-        for q, a in zip(questions, answers):
-            notes_dict[q] = a
+        for q in questions:
+            label = tk.Label(self.questions_frame, text=q)
+            label.pack(anchor="w")
+            textbox = tk.Text(self.questions_frame, height=2, width=60)
+            textbox.pack(pady=2)
+            self.question_labels.append(label)
+            self.question_textboxes.append(textbox)
+
+    def save_entry(self):
+        city = self.city_entry.get()
+        mood = self.mood_entry.get()
+        notes = self.notes_entry.get("1.0", tk.END).strip()
+
+        selected = self.selected_category.get()
+        questions = self.category_questions.get(selected, [])
+        answers = []
+
+        for box in self.question_textboxes:
+            answer = box.get("1.0", tk.END).strip()
+            answers.append(answer)
+
+        full_entry = f"Category: {selected}\n"
+        for i in range(len(questions)):
+            full_entry += f"{questions[i]}\n{answers[i]}\n\n"
+        full_entry += f"Mood: {mood}\nAdditional Notes: {notes}"
 
         try:
-            save_journal_entry(city=city, mood=mood, notes=notes_dict)
+            save_journal_entry(city, mood, full_entry)
             messagebox.showinfo("Success", "Journal entry saved!")
-            for tb in self.answer_textboxes:
-                tb.delete("1.0", tk.END)
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to save journal entry:\n{e}")
+            messagebox.showerror("Error", f"Failed to save entry:\n{e}")
 
-    def setup_forecast_section(self):
-        frame = ttk.LabelFrame(self.main_frame, text="Forecast")
-        frame.pack(fill='x', padx=10, pady=5)
-        self.forecast_fig, ax = plt.subplots(figsize=(4, 2))
-        self.forecast_canvas = FigureCanvasTkAgg(self.forecast_fig, master=frame)
-        self.forecast_canvas.get_tk_widget().pack()
-        self.forecast_canvas.draw()
+def launch_app():
+    root = tk.Tk()
+    root.geometry("600x800")
+    root.title("VibeCheck: Weather Edition")
 
-    def update_weather_display(self, data):
-        main = data.get('main', {})
-        sys = data.get('sys', {})
-        self.labels['Location'].config(text=f"Location: {data.get('name', '--')}")
-        self.labels['Temperature'].config(text=f"Temperature: {main.get('temp', '--')} °C")
-        self.labels['Pressure'].config(text=f"Pressure: {main.get('pressure', '--')} hPa")
-        vis = data.get('visibility', 0)
-        self.labels['Visibility'].config(text=f"Visibility: {vis / 1000:.1f} km")
-        self.labels['Sunrise'].config(text=f"Sunrise: {self.app.format_time(sys.get('sunrise', 0))}")
-        self.labels['Sunset'].config(text=f"Sunset: {self.app.format_time(sys.get('sunset', 0))}")
-        self.update_forecast_plot(data.get('forecast', []))
-        print("🌤️ Weather display updated.")
+    welcome_screen = WelcomeScreen(root, lambda username: start_dashboard(username, root, welcome_screen))
+    welcome_screen.pack(fill="both", expand=True)
 
-    def update_forecast_plot(self, forecast):
-        if not forecast or not self.forecast_fig:
-            return
-        ax = self.forecast_fig.gca()
-        ax.clear()
-        hours = [f['dt_txt'].split()[1][:5] for f in forecast[:6]]
-        temps = [f['main']['temp'] for f in forecast[:6]]
-        ax.plot(hours, temps, marker='o')
-        ax.set_title("Next 6 Hours Forecast")
-        ax.set_ylabel("Temp (°C)")
-        ax.set_xlabel("Time")
-        self.forecast_canvas.draw()
+    root.mainloop()
+
+def start_dashboard(username, root, welcome_screen):
+    welcome_screen.pack_forget()
+    dashboard = Dashboard(root, username)
+    dashboard.pack(fill="both", expand=True)
+
+
+
+
