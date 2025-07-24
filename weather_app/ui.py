@@ -2,28 +2,37 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from weather import get_weather_data
 from journal_utils import save_journal_entry
+from PIL import Image, ImageTk
 
 class WelcomeScreen(tk.Frame):
     def __init__(self, master, on_submit_name):
         super().__init__(master)
         self.on_submit_name = on_submit_name
 
-        # Title
+# Load and set background image for this frame
+        bg_image = Image.open("background.png")
+        bg_image = bg_image.resize((600, 800), Image.Resampling.LANCZOS)
+        self.bg_photo = ImageTk.PhotoImage(bg_image)
+        bg_label = tk.Label(self, image=self.bg_photo)
+        bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+
+        # Title (place above background)
         tk.Label(self, text="🌤️ VibeCheck: Weather Edition",
-                 font=("Helvetica", 26, "bold"), fg="#4A90E2").pack(pady=(30, 5))
+                 font=("Helvetica", 26, "bold"), fg="#4A90E2", bg="#ffffff").pack(pady=(30, 5))
 
         # Tagline
         tk.Label(self, text="Track the skies. Reflect the soul.",
-                 font=("Helvetica", 14, "italic"), fg="#666").pack(pady=(0, 20))
+                 font=("Helvetica", 14, "italic"), fg="#666", bg="#ffffff").pack(pady=(0, 20))
 
         # Name input prompt
-        tk.Label(self, text="Welcome! What's your name?", font=("Helvetica", 12)).pack(pady=(10, 5))
+        tk.Label(self, text="Welcome! What's your name?", font=("Helvetica", 12), bg="#ffffff").pack(pady=(10, 5))
         self.name_entry = tk.Entry(self, font=("Helvetica", 12))
         self.name_entry.pack()
 
         # Submit button
         tk.Button(self, text="Start Vibe Check", font=("Helvetica", 12, "bold"),
                   bg="#4A90E2", fg="white", command=self.submit_name).pack(pady=20)
+        
 
     def submit_name(self):
         username = self.name_entry.get().strip()
@@ -39,6 +48,17 @@ class Dashboard(tk.Frame):
         self.username = username
 
         self.use_celsius = True  # Default temperature unit
+
+        # Load and set background image for this frame
+        bg_image = Image.open("background.png")
+        bg_image = bg_image.resize((600, 800), Image.Resampling.LANCZOS)
+        self.bg_photo = ImageTk.PhotoImage(bg_image)
+        bg_label = tk.Label(self, image=self.bg_photo)
+        bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+
+        self.use_celsius = True  # Default temperature unit
+
+        # ...existing code...
 
         # Journal categories and questions
         self.category_questions = {
@@ -182,6 +202,17 @@ def launch_app():
     root = tk.Tk()
     root.geometry("600x800")
     root.title("VibeCheck: Weather Edition")
+
+ # Load and set background image
+    try:
+        bg_image = Image.open("background.png")  # Make sure this file exists
+        bg_image = bg_image.resize((600, 800), Image.Resampling.LANCZOS)
+        bg_photo = ImageTk.PhotoImage(bg_image)
+        bg_label = tk.Label(root, image=bg_photo)
+        bg_label.image = bg_photo  # Keep a reference!
+        bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+    except Exception as e:
+        print(f"Background image error: {e}")
 
     welcome_screen = WelcomeScreen(root, lambda username: start_dashboard(username, root, welcome_screen))
     welcome_screen.pack(fill="both", expand=True)
