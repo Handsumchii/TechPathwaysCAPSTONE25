@@ -3,36 +3,31 @@ from tkinter import ttk, messagebox
 from weather import get_weather_data
 from journal_utils import save_journal_entry
 from PIL import Image, ImageTk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from weather_dashboard import generate_charts  # Make sure this is not a circular import
 
 class WelcomeScreen(tk.Frame):
     def __init__(self, master, on_submit_name):
         super().__init__(master)
         self.on_submit_name = on_submit_name
 
-# Load and set background image for this frame
+        # Background
         bg_image = Image.open("background.png")
         bg_image = bg_image.resize((600, 800), Image.Resampling.LANCZOS)
         self.bg_photo = ImageTk.PhotoImage(bg_image)
         bg_label = tk.Label(self, image=self.bg_photo)
         bg_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-        # Title (place above background)
+        # Title and inputs
         tk.Label(self, text="🌤️ VibeCheck: Weather Edition",
-                 font=("Helvetica", 26, "bold"), fg="#4A90E2", bg="#ffffff").pack(pady=(30, 5))
-
-        # Tagline
+                 font=("Sans serif", 26, "bold"), fg="#4A90E2", bg="#ffffff").pack(pady=(30, 5))
         tk.Label(self, text="Track the skies. Reflect the soul.",
                  font=("Helvetica", 14, "italic"), fg="#666", bg="#ffffff").pack(pady=(0, 20))
-
-        # Name input prompt
         tk.Label(self, text="Welcome! What's your name?", font=("Helvetica", 12), bg="#ffffff").pack(pady=(10, 5))
         self.name_entry = tk.Entry(self, font=("Helvetica", 12))
         self.name_entry.pack()
-
-        # Submit button
         tk.Button(self, text="Start Vibe Check", font=("Helvetica", 12, "bold"),
                   bg="#4A90E2", fg="white", command=self.submit_name).pack(pady=20)
-        
 
     def submit_name(self):
         username = self.name_entry.get().strip()
@@ -46,21 +41,16 @@ class Dashboard(tk.Frame):
         super().__init__(master)
         self.master = master
         self.username = username
+        self.use_celsius = True  # Default unit
 
-        self.use_celsius = True  # Default temperature unit
-
-        # Load and set background image for this frame
+        # Background
         bg_image = Image.open("background.png")
         bg_image = bg_image.resize((600, 800), Image.Resampling.LANCZOS)
         self.bg_photo = ImageTk.PhotoImage(bg_image)
         bg_label = tk.Label(self, image=self.bg_photo)
         bg_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-        self.use_celsius = True  # Default temperature unit
-
-        # ...existing code...
-
-        # Journal categories and questions
+        # Journal Categories
         self.category_questions = {
             "Emotional Health": [
                 "How are you feeling emotionally today?",
@@ -82,28 +72,24 @@ class Dashboard(tk.Frame):
         self.selected_category = tk.StringVar()
         self.question_labels = []
         self.question_textboxes = []
-
+        self.chart_canvases = []  # Store chart canvases for later cleanup
         self.create_widgets()
 
     def create_widgets(self):
-        # Greeting
         tk.Label(self, text=f"Welcome back, {self.username}! 👋",
                  font=("Helvetica", 16, "bold"), fg="#333").pack(pady=(20, 10))
 
-        # City input and weather display
+        # City + weather
         tk.Label(self, text="Enter City:").pack()
         self.city_entry = tk.Entry(self)
         self.city_entry.pack()
-
         tk.Button(self, text="Get Weather", command=self.get_weather).pack(pady=5)
-
         self.toggle_temp_button = tk.Button(self, text="Switch to °F", command=self.toggle_temperature_unit)
         self.toggle_temp_button.pack(pady=5)
-
         self.weather_display = tk.Label(self, text="", font=("Helvetica", 14))
         self.weather_display.pack(pady=10)
 
-        # Journal Section
+        # Journal
         tk.Label(self, text="Today's Mood:").pack()
         self.mood_entry = tk.Entry(self)
         self.mood_entry.pack(pady=5)
@@ -122,6 +108,10 @@ class Dashboard(tk.Frame):
         self.notes_entry.pack(pady=5)
 
         tk.Button(self, text="Save Entry", command=self.save_entry).pack(pady=10)
+
+        # Chart frame
+        self.charts_frame = tk.Frame(self)
+        self.charts_frame.pack(pady=20)
 
     def toggle_temperature_unit(self):
         self.use_celsius = not self.use_celsius
@@ -142,13 +132,12 @@ class Dashboard(tk.Frame):
     def display_weather(self, city):
         try:
             data = get_weather_data(city)
-            kelvin_temp = data["main"]["temp"]
-            if self.use_celsius:
-                temperature = kelvin_temp - 273.15
-                unit = "°C"
-            else:
-                temperature = (kelvin_temp - 273.15) * 9 / 5 + 32
+            temperature = data["main"]["temp"]
+            if not self.use_celsius:
+                temperature = temperature * 9 / 5 + 32
                 unit = "°F"
+            else:
+                unit = "°C"
 
             weather = data["weather"][0]["description"].capitalize()
             output = f"{city} Weather: {temperature:.1f}{unit}, {weather}"
@@ -159,7 +148,6 @@ class Dashboard(tk.Frame):
     def on_category_change(self, event=None):
         for widget in self.questions_frame.winfo_children():
             widget.destroy()
-
         self.question_labels.clear()
         self.question_textboxes.clear()
 
@@ -181,11 +169,7 @@ class Dashboard(tk.Frame):
 
         selected = self.selected_category.get()
         questions = self.category_questions.get(selected, [])
-        answers = []
-
-        for box in self.question_textboxes:
-            answer = box.get("1.0", tk.END).strip()
-            answers.append(answer)
+        answers = [box.get("1.0", tk.END).strip() for box in self.question_textboxes]
 
         full_entry = f"Category: {selected}\n"
         for i in range(len(questions)):
@@ -195,35 +179,45 @@ class Dashboard(tk.Frame):
         try:
             save_journal_entry(city, mood, full_entry)
             messagebox.showinfo("Success", "Journal entry saved!")
+            self.show_charts()  # Refresh charts
         except Exception as e:
             messagebox.showerror("Error", f"Failed to save entry:\n{e}")
+
+    def show_charts(self):
+        for canvas in self.chart_canvases:
+            canvas.get_tk_widget().destroy()
+        self.chart_canvases.clear()
+
+        charts = generate_charts()
+        if not charts:
+            return
+
+        for fig in charts:
+            canvas = FigureCanvasTkAgg(fig, master=self.charts_frame)
+            canvas.draw()
+            canvas.get_tk_widget().pack(padx=5, pady=5)
+            self.chart_canvases.append(canvas)
 
 def launch_app():
     root = tk.Tk()
     root.geometry("600x800")
     root.title("VibeCheck: Weather Edition")
 
- # Load and set background image
     try:
-        bg_image = Image.open("background.png")  # Make sure this file exists
+        bg_image = Image.open("background.png")
         bg_image = bg_image.resize((600, 800), Image.Resampling.LANCZOS)
         bg_photo = ImageTk.PhotoImage(bg_image)
         bg_label = tk.Label(root, image=bg_photo)
-        bg_label.image = bg_photo  # Keep a reference!
+        bg_label.image = bg_photo
         bg_label.place(x=0, y=0, relwidth=1, relheight=1)
     except Exception as e:
         print(f"Background image error: {e}")
 
     welcome_screen = WelcomeScreen(root, lambda username: start_dashboard(username, root, welcome_screen))
     welcome_screen.pack(fill="both", expand=True)
-
     root.mainloop()
 
 def start_dashboard(username, root, welcome_screen):
     welcome_screen.pack_forget()
     dashboard = Dashboard(root, username)
     dashboard.pack(fill="both", expand=True)
-
-
-
-
