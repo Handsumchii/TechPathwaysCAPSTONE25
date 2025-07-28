@@ -1,0 +1,51 @@
+timestamp,temperature,mood,note
+2025-06-01 15:00:00,85.3,Neutral,Went swimming
+2025-06-02 08:00:00,77.8,Neutral,Went swimming
+2025-06-03 13:00:00,88.7,Sad,Great walk with dog
+2025-06-04 20:00:00,89.4,Happy,Watched a movie
+2025-06-05 16:00:00,72.6,Neutral,Worked from home
+2025-06-06 18:00:00,73.3,Happy,Very productive day
+2025-06-07 15:00:00,79.5,Happy,Caught in a thunderstorm
+2025-06-08 14:00:00,66.7,Sad,Cozy and rainy
+2025-06-09 20:00:00,61.8,Neutral,Great walk with dog
+2025-06-10 12:00:00,66.3,Sad,Got stuck in traffic
+2025-06-11 20:00:00,62.8,Sad,Too hot to go outside
+2025-06-12 08:00:00,72.8,Happy,Got stuck in traffic
+2025-06-13 12:00:00,92.1,Happy,Watched a movie
+2025-06-14 18:00:00,72.1,Neutral,Rainy but peaceful
+2025-06-15 14:00:00,90.6,Sad,Too hot to go outside
+2025-06-16 13:00:00,73.4,Happy,Got stuck in traffic
+2025-06-17 19:00:00,81.2,Neutral,Got stuck in traffic
+2025-06-18 12:00:00,66.3,Sad,Caught in a thunderstorm
+2025-06-19 18:00:00,90.9,Happy,Rainy but peaceful
+2025-06-20 10:00:00,76.1,Sad,Great walk with dog
+2025-06-21 18:00:00,62.4,Sad,Worked from home
+2025-06-22 08:00:00,70.3,Happy,Cozy and rainy
+2025-06-23 14:00:00,82.0,Neutral,Needed more coffee
+2025-06-24 19:00:00,67.0,Sad,Watched a movie
+2025-06-25 15:00:00,76.4,Happy,Too hot to go outside
+2025-06-26 18:00:00,93.5,Happy,Cozy and rainy
+2025-06-27 16:00:00,77.4,Sad,Felt great after a run
+2025-06-28 12:00:00,80.8,Neutral,Went swimming
+2025-06-29 16:00:00,68.4,Happy,Rainy but peaceful
+2025-06-30 08:00:00,87.2,Neutral,Watched a movie
+2025-07-01 12:00:00,87.2,Sad,Too hot to go outside
+2025-07-02 09:00:00,71.9,Sad,Cozy and rainy
+2025-07-03 12:00:00,65.9,Neutral,Cozy and rainy
+2025-07-04 19:00:00,72.4,Happy,Watched a movie
+2025-07-05 19:00:00,70.7,Neutral,Felt great after a run
+2025-07-06 14:00:00,93.3,Happy,Felt great after a run
+2025-07-07 16:00:00,74.5,Sad,Very productive day
+2025-07-08 17:00:00,86.7,Neutral,Worked from home
+2025-07-09 09:00:00,91.9,Neutral,Watched a movie
+2025-07-10 16:00:00,68.2,Happy,Needed more coffee
+2025-07-11 18:00:00,76.1,Sad,Very productive day
+2025-07-12 14:00:00,89.2,Neutral,Worked from home
+2025-07-13 19:00:00,67.1,Neutral,Rainy but peaceful
+2025-07-14 17:00:00,65.0,Neutral,Too hot to go outside
+2025-07-15 16:00:00,93.8,Sad,Too hot to go outside
+2025-07-16 12:00:00,72.0,Happy,Needed more coffee
+2025-07-17 14:00:00,62.1,Happy,Went swimming
+2025-07-18 09:00:00,76.4,Sad,Caught in a thunderstorm
+2025-07-19 09:00:00,64.9,Neutral,Needed more coffee
+2025-07-20 09:00:00,75.6,Sad,Felt great after a run
