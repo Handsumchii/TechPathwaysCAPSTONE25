@@ -74,5 +74,11 @@
         "mood": "",
         "notes": "Category: \nMood: \nAdditional Notes: ",
         "timestamp": "2025-07-28T18:38:23.547687"
+    },
+    {
+        "city": "White Plains",
+        "mood": "Exhausted",
+        "notes": "Category: Emotional Health\nHow are you feeling emotionally today?\nGreat\n\nWhat has affected your mood most?\nThe Heat\n\nWhat support do you need?\nA/C\n\nMood: Exhausted\nAdditional Notes: ",
+        "timestamp": "2025-07-28T18:47:15.146305"
     }
 ]
