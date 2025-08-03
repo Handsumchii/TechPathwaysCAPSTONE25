@@ -4,15 +4,15 @@ from datetime import datetime
 
 JOURNAL_FILE = os.path.join(os.path.dirname(__file__), "journal_entries.json")
 
-def save_journal_entry(city, mood, notes, file_path=JOURNAL_FILE):
-    """
-    Save a journal entry as a JSON object to the file.
-    Raises an exception if saving fails.
-    """
+def save_journal_entry(weather_data, mood, notes, q1, q2, q3, file_path=JOURNAL_FILE):
     entry_data = {
-        "city": city,
+        "city": weather_data.get("name", "Unknown"),
         "mood": mood,
         "notes": notes,
+        "q1": q1,
+        "q2": q2,
+        "q3": q3,
+        "temp": weather_data.get("main", {}).get("temp", "N/A"),
         "timestamp": datetime.now().isoformat()
     }
 
@@ -22,7 +22,7 @@ def save_journal_entry(city, mood, notes, file_path=JOURNAL_FILE):
             try:
                 data = json.load(file)
             except json.JSONDecodeError:
-                data = []  # file corrupted or empty, reset data list
+                data = []
 
     data.append(entry_data)
 
@@ -31,10 +31,6 @@ def save_journal_entry(city, mood, notes, file_path=JOURNAL_FILE):
     print("📝 Journal entry saved.")
 
 def load_journal_entries(file_path=JOURNAL_FILE):
-    """
-    Load journal entries from the JSON file.
-    Returns a list of entries or empty list if none exist.
-    """
     if os.path.exists(file_path):
         try:
             with open(file_path, "r", encoding="utf-8") as file:
@@ -43,3 +39,9 @@ def load_journal_entries(file_path=JOURNAL_FILE):
             print(f"Error loading journal entries: {e}")
             return []
     return []
+
+
+
+
+
+

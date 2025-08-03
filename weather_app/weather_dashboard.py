@@ -1,36 +1,51 @@
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import json
+import os
+from datetime import datetime
 
-# Import or define generate_charts function
+JOURNAL_FILE = os.path.join(os.path.dirname(__file__), "journal_entries.json")
+
+MOOD_COLORS = {
+    "Happy": "green",
+    "Neutral": "gray",
+    "Sad": "blue",
+    "Angry": "red"
+}
+
 def generate_charts():
-    # Placeholder: Replace with actual chart generation logic
-    import matplotlib.pyplot as plt
-    fig, ax = plt.subplots()
-    ax.plot([1, 2, 3], [4, 5, 6])
-    ax.set_title("Sample Chart")
-    return [fig]
+    if not os.path.exists(JOURNAL_FILE):
+        return []
 
+    with open(JOURNAL_FILE, "r", encoding="utf-8") as f:
+        try:
+            data = json.load(f)
+        except json.JSONDecodeError:
+            return []
 
-def show_charts(self):
-    print("[UI] Attempting to generate charts...")
-    for canvas in self.chart_canvases:
-        canvas.get_tk_widget().destroy()
-    self.chart_canvases.clear()
+    if not data:
+        return []
 
-    charts = generate_charts()
-    print(f"[UI] {len(charts)} charts returned.")
+    # Prepare data
+    dates = [datetime.fromisoformat(entry["timestamp"]) for entry in data]
+    temps = [entry.get("temp", 0) for entry in data]
+    moods = [entry.get("mood", "Neutral") for entry in data]
 
-    if not charts:
-        print("[UI] No charts generated.")
-        return
+    # Chart 1: Temperature over time
+    fig1, ax1 = plt.subplots()
+    ax1.plot(dates, temps, marker="o", linestyle="-", color="skyblue")
+    ax1.set_title("Temperature Over Time")
+    ax1.set_xlabel("Date")
+    ax1.set_ylabel("Temperature")
+    ax1.xaxis.set_major_formatter(mdates.DateFormatter("%b %d"))
+    ax1.grid(True)
 
-    for fig in charts:
-        canvas = FigureCanvasTkAgg(fig, master=self.charts_frame)
-        canvas.draw()
-        canvas.get_tk_widget().pack(padx=5, pady=5)
-        self.chart_canvases.append(canvas)
+    # Chart 2: Mood Frequency
+    fig2, ax2 = plt.subplots()
+    mood_counts = {m: moods.count(m) for m in set(moods)}
+    ax2.bar(mood_counts.keys(), mood_counts.values(), color=[MOOD_COLORS.get(m, "gray") for m in mood_counts])
+    ax2.set_title("Mood Frequency")
+    ax2.set_xlabel("Mood")
+    ax2.set_ylabel("Count")
 
-
-
-
-
-
+    return [fig1, fig2]
