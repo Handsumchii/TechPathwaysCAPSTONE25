@@ -4,14 +4,14 @@ from datetime import datetime
 
 JOURNAL_FILE = os.path.join(os.path.dirname(__file__), "journal_entries.json")
 
-def save_journal_entry(weather_data, mood, notes, q1, q2, q3, file_path=JOURNAL_FILE):
+def save_journal_entry(weather_data, mood, notes, phys_q, mind_q, emot_q, file_path=JOURNAL_FILE):
     entry_data = {
         "city": weather_data.get("name", "Unknown"),
         "mood": mood,
         "notes": notes,
-        "q1": q1,
-        "q2": q2,
-        "q3": q3,
+        "physical_health": phys_q,
+        "mindfulness": mind_q,
+        "emotional_checkin": emot_q,
         "temp": weather_data.get("main", {}).get("temp", "N/A"),
         "timestamp": datetime.now().isoformat()
     }
@@ -39,9 +39,3 @@ def load_journal_entries(file_path=JOURNAL_FILE):
             print(f"Error loading journal entries: {e}")
             return []
     return []
-
-
-
-
-
-

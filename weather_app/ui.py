@@ -16,9 +16,8 @@ class App(ctk.CTk):
         self.resizable(False, False)
         self.user_name = ""
         self.unit = "metric"
-        self.protocol("WM_DELETE_WINDOW", self.destroy)  # graceful close
+        self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.switch_frame(WelcomeScreen)
-
 
     def switch_frame(self, frame_class):
         new_frame = frame_class(self)
@@ -92,20 +91,17 @@ class WeatherDashboardScreen(ctk.CTkFrame):
             messagebox.showinfo("No Data", "No journal data to display.")
             return
 
-        # Store the window and charts to avoid garbage collection
         self.chart_window = ctk.CTkToplevel(self)
         self.chart_window.title("Mood & Weather Charts")
         self.chart_window.geometry("900x700")
-
-        self.chart_canvases = []  # prevent garbage collection
+        self.chart_canvases = []
 
         for fig in charts:
             canvas = FigureCanvasTkAgg(fig, master=self.chart_window)
             canvas.draw()
             widget = canvas.get_tk_widget()
             widget.pack(pady=10)
-            self.chart_canvases.append(canvas)  # ⬅️ Keep reference alive
-
+            self.chart_canvases.append(canvas)
 
     def view_entries(self):
         entries = load_journal_entries()
@@ -116,9 +112,9 @@ class WeatherDashboardScreen(ctk.CTkFrame):
         for entry in entries:
             text.insert("end", (
                 f"{entry['timestamp']} - {entry['mood']}\n"
-                f"1. What impacted your mood today? {entry.get('q1', '')}\n"
-                f"2. What are you grateful for? {entry.get('q2', '')}\n"
-                f"3. What is one intention for tomorrow? {entry.get('q3', '')}\n"
+                f"Physical Health: {entry.get('q1', '')}\n"
+                f"Mindfulness: {entry.get('q2', '')}\n"
+                f"Emotional Check-in: {entry.get('q3', '')}\n"
                 f"Notes: {entry['notes']}\n\n"
             ))
 
@@ -134,14 +130,19 @@ class JournalFormScreen(ctk.CTkFrame):
         for mood in moods:
             ctk.CTkRadioButton(self, text=mood, variable=self.mood_var, value=mood.split()[1]).pack(anchor="w")
 
-        self.q1 = ctk.CTkEntry(self, placeholder_text="What impacted your mood today?")
+        ctk.CTkLabel(self, text="Physical Health: Did you sleep well or get exercise today?").pack()
+        self.q1 = ctk.CTkTextbox(self, height=50)
         self.q1.pack(pady=5)
-        self.q2 = ctk.CTkEntry(self, placeholder_text="What are you grateful for?")
+
+        ctk.CTkLabel(self, text="Mindfulness: What moment made you pause or reflect today?").pack()
+        self.q2 = ctk.CTkTextbox(self, height=50)
         self.q2.pack(pady=5)
-        self.q3 = ctk.CTkEntry(self, placeholder_text="What is one intention for tomorrow?")
+
+        ctk.CTkLabel(self, text="Emotional Check-in: What emotion stood out and why?").pack()
+        self.q3 = ctk.CTkTextbox(self, height=50)
         self.q3.pack(pady=5)
 
-        ctk.CTkLabel(self, text="Any notes?").pack(pady=5)
+        ctk.CTkLabel(self, text="Any other notes?").pack(pady=5)
         self.notes_entry = ctk.CTkTextbox(self, height=100)
         self.notes_entry.pack(pady=5)
 
@@ -151,9 +152,9 @@ class JournalFormScreen(ctk.CTkFrame):
     def save_entry(self):
         mood = self.mood_var.get()
         notes = self.notes_entry.get("1.0", "end").strip()
-        q1 = self.q1.get().strip()
-        q2 = self.q2.get().strip()
-        q3 = self.q3.get().strip()
+        q1 = self.q1.get("1.0", "end").strip()
+        q2 = self.q2.get("1.0", "end").strip()
+        q3 = self.q3.get("1.0", "end").strip()
         if not mood:
             messagebox.showerror("Missing Mood", "Please select a mood.")
             return
