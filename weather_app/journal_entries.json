@@ -160,5 +160,25 @@
         "emotional_checkin": "calm",
         "temp": 86.02,
         "timestamp": "2025-08-04T14:08:19.803847"
+    },
+    {
+        "city": "Atlanta",
+        "mood": "Happy",
+        "notes": "",
+        "physical_health": "",
+        "mindfulness": "",
+        "emotional_checkin": "Drained because he has been busting his ass with capstone. EXHAUSTED!!!",
+        "temp": 64.83,
+        "timestamp": "2025-08-04T20:45:28.856851"
+    },
+    {
+        "city": "White Plains",
+        "mood": "Happy",
+        "notes": "I am trting to just stay still",
+        "physical_health": "I didnt get to exercise but slept like a baby",
+        "mindfulness": "Alysha's announcement. I am so proud to know her",
+        "emotional_checkin": "Peace. I'm just not used to it",
+        "temp": 72.14,
+        "timestamp": "2025-08-06T19:29:09.980445"
     }
 ]

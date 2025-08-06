@@ -1,93 +1,49 @@
 # TechPathwaysCAPSTONE25
-# Interactive Weather App – Capstone Project
-
-## Overview
-
-This project is an interactive, Tkinter-based desktop application that displays real-time weather data, a personal weather journal, and animated visual feedback based on current conditions. It was developed as part of the Justice Through Code Capstone experience to demonstrate applied Python development, API integration, and UI design.
-
----
-
-## Features
-
-| Feature                 | Description |
-|------------------------|-------------|
-| **Real-Time Weather Display** | Pulls current weather data from the OpenWeatherMap API for any valid location. |
-| **Weather Mood Journal** | Lets users record a mood or note alongside daily weather conditions. |
-| **Animated Weather Icons** | Visual feedback like sun, rain, and clouds reflect current weather dynamically. |
-| **Dark Mode Support** | Toggle between light and dark themes to enhance user experience. |
-| **Forecast Comparison Tool** | Shows side-by-side temperature forecasts across multiple cities. |
-
----
-
-## Project Structure
-
-/interactive-weather-app
-│
-├── main.py # Entry point for the application
-├── config.py # Configuration loader (API key, settings)
-├── .env # Stores API key (NOT committed)
-├── /data/ # Local storage for journal and history
-│ └── weather_history.txt
-├── /features/
-│ ├── weather_journal.py # Journal feature
-│ ├── animated_icons.py # Icon/animation logic
-│ └── forecast_comparison.py # Forecast tool
-├── /docs/
-│ └── Week11_Reflection.md # Project setup and planning document
-└── README.md
-
-
-## How To Use It
-
-### 1. Clone the project
-
-```bash
-git clone https://github.com/YOUR_USERNAME/interactive-weather-app.git
-cd interactive-weather-app
-2. Install dependencies
+🛠️ Setup Instructions
+1.	Clone the Repository
 bash
-Copy
-Edit
+git clone https://github.com/yourusername/vibecheck-weather-app.git
+cd vibecheck-weather-app
+2.	Create a Virtual Environment (Optional but Recommended)
+bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+3.	Install Dependencies
+bash
 pip install -r requirements.txt
-3. Set up your .env file
-Create a .env file and add your API key:
-
-env
-Copy
-Edit
-OPENWEATHER_API_KEY=your_api_key_here
-4. Run the app
+4.	Set Up Environment Variables
+Create a .env file in the root directory and add your OpenWeatherMap API key:
+ini
+WEATHER_API_KEY=your_api_key_here
+5.	Run the App
 bash
-Copy
-Edit
-python main.py
- Tools I Used
-Python
+python -m weather_app.main
+________________________________________
+📖 Usage Guide
+1.	Launch the App
+Start from the welcome screen and enter your name and city.
+2.	View the Weather Dashboard
+o	Displays real-time weather data (temperature, humidity, etc.)
+o	Toggle between °C and °F
+o	View current UV index, "feels like" temp, and air quality
+3.	Track Your Mood
+o	Enter your mood and optional notes for the day
+o	Save journal entries linked to the weather
+4.	Review Journal Entries
+o	Click "View Entries" to browse past moods and weather conditions
+5.	View Data Visualizations
+o	Compare mood trends and weather patterns with built-in charts
+________________________________________
+✨ Feature Summary
+•	🌡️ Real-time Weather Lookup via OpenWeatherMap API
+•	💬 Mood Journaling tied to current weather data
+•	📊 Visual Analytics:
+o	Weather trends
+o	Mood vs. weather comparison charts
+•	🕶️ Theme Toggle (Light/Dark mode)
+•	📚 Journal History Viewer with timestamped entries
+•	🔐 .env Support for secure API key storage
+•	🧠 User-Friendly Interface built with Tkinter and PIL
+•	🌍 Temperature Unit Switching (Celsius / Fahrenheit)
 
-Tkinter for building the GUI
-
-OpenWeatherMap API
-
-Matplotlib for visuals
-
-Pandas for working with CSV/text data
-
-dotenv for handling the API key safely
-
- Development Timeline
-Week	Focus
-12	Basic UI and API setup
-13	Weather Journal feature
-14	Forecast comparison
-15	Animated weather icons
-16	Dark mode + polish
-17	Testing + showcase
-
- Lessons & Growth
-This project pushed me to think about user experience, code structure, and handling real-time data. I had to overcome some blockers (API limits, error handling, animation quirks), but I leaned into Slack support and office hours to move forward. The biggest win? Seeing the features actually work together and feel cohesive.
-
- About Me
-Devin Cambridge
-GitHub:https://github.com/Handsumchii
-Email: Dcambridge7188@gmail.com
-I’m focused on tech that brings people together, builds awareness, and creates new opportunities—especially for justice-impacted communities. This app is one small step in that direction.
+Designed to help you check the vibe of your day – both emotionally and atmospherically.

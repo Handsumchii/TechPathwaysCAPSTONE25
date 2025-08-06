@@ -1,0 +1,21 @@
+# Core dependency for making HTTP requests to weather APIs
+requests>=2.31.0
+
+# Used to securely load environment variables (e.g., API keys)
+python-dotenv>=1.0.0
+
+# Required for loading and displaying weather-related images in the GUI
+Pillow>=10.3.0
+
+# For creating and rendering charts and graphs (weather trends, mood analysis)
+matplotlib>=3.9.0
+
+# Optional but recommended for enhanced color support on certain platforms
+# If you face issues with Tkinter theming or Unicode rendering, consider adding:
+# colorama>=0.4.6
+📝 Best Practices:
+Versions are pinned with >= to ensure compatibility while allowing future updates.
+
+Tkinter is not included because it’s part of the Python standard library (pre-installed with most Python distributions).
+
+Avoid bloating the file with unnecessary packages to keep your app lightweight and maintainable.
